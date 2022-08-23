@@ -25,7 +25,7 @@ app.get("/users/:id", (req, res) => {
   });
 });
 
-// add users
+// add a user
 app.post("/users", (req, res) => {
   const { name, email, age } = req.body;
   // check if the user already exists
@@ -47,6 +47,25 @@ app.post("/users", (req, res) => {
       );
     }
   );
+});
+
+// delete a user
+app.delete("/users/:id", (req, res) => {
+  const id = req.params.id;
+
+  pool.query("SELECT FROM users WHERE id = $1", [id], (error, results) => {
+    if (error) throw error;
+
+    const isUserExist = results.rows.length;
+    if (!isUserExist) {
+      return res.send("User does not exist.");
+    }
+
+    pool.query("DELETE FROM users WHERE id = $1", [id], (error, results) => {
+      if (error) throw error;
+      return res.status(200).send("user deleted");
+    });
+  });
 });
 
 app.listen(PORT, () => console.log(`Server running @ ${PORT}`));
