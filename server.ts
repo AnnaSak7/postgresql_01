@@ -68,4 +68,29 @@ app.delete("/users/:id", (req, res) => {
   });
 });
 
+// update a user
+app.put("/users/:id", (req, res) => {
+  const id = req.params.id;
+
+  const name = req.body.name;
+
+  pool.query("SELECT FROM users WHERE id =$1", [id], (error, results) => {
+    if (error) throw error;
+
+    const isUserExist = results.rows.length;
+    if (!isUserExist) {
+      return res.send("User does not exist");
+    }
+
+    pool.query(
+      "UPDATE users SET name = $1 WHERE id = $2",
+      [name, id],
+      (error, results) => {
+        if (error) throw error;
+        return res.status(200).send("Updated");
+      }
+    );
+  });
+});
+
 app.listen(PORT, () => console.log(`Server running @ ${PORT}`));
