@@ -15,4 +15,14 @@ app.get("/users", (req, res) => {
   });
 });
 
+// get specific user data
+app.get("/users/:id", (req, res) => {
+  const id = req.params.id;
+
+  pool.query("SELECT * FROM users WHERE id = $1", [id], (error, results) => {
+    if (error) throw error;
+    return res.status(200).json(results.rows);
+  });
+});
+
 app.listen(PORT, () => console.log(`Server running @ ${PORT}`));
