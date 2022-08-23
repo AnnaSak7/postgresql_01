@@ -25,4 +25,28 @@ app.get("/users/:id", (req, res) => {
   });
 });
 
+// add users
+app.post("/users", (req, res) => {
+  const { name, email, age } = req.body;
+  // check if the user already exists
+  pool.query(
+    "SELECT * FROM users s WHERE s.email = $1",
+    [email],
+    (error, results) => {
+      if (results.rows.length) {
+        return res.send("User already exists");
+      }
+
+      pool.query(
+        "INSERT INTO users(name, email, age) values($1, $2, $3)",
+        [name, email, age],
+        (error, results) => {
+          if (error) throw error;
+          res.status(201).send("user created");
+        }
+      );
+    }
+  );
+});
+
 app.listen(PORT, () => console.log(`Server running @ ${PORT}`));
